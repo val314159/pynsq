@@ -148,6 +148,7 @@ class Reader(Client):
             lookupd_poll_jitter=0.3,
             lookupd_connect_timeout=1,
             lookupd_request_timeout=2,
+            enable_async=False,
             **kwargs):
         super(Reader, self).__init__(**kwargs)
 
@@ -199,6 +200,7 @@ class Reader(Client):
         self.lookupd_connect_timeout = lookupd_connect_timeout
         self.lookupd_request_timeout = lookupd_request_timeout
         self.random_rdy_ts = time.time()
+        self.enable_async = enable_async
 
         # Verify keyword arguments
         valid_args = inspect.getargspec(async.AsyncConn.__init__)[0]
@@ -680,6 +682,9 @@ class Reader(Client):
 
         :param message: the :class:`nsq.Message` received
         """
+        if self.enable_async:
+            message.enable_async()
+
         return self.message_handler(message)
 
     def giving_up(self, message):
